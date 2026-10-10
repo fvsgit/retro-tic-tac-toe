@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Neon Tac</title>
+  <meta name="description" content="Retro arcade tic-tac-toe for one or two players.">
+  <meta name="theme-color" content="#05010a">
+  <meta name="color-scheme" content="dark">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Neon Tac">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="preload" href="fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="crt" aria-hidden="true"></div>
+  <div class="app">
+    <header class="topbar">
+      <button type="button" id="home" class="logo">NEON TAC</button>
+      <div class="top-actions">
+        <button type="button" id="mute" aria-pressed="false">SND</button>
+        <button type="button" id="fullscreen" hidden aria-pressed="false">FULL</button>
+      </div>
+    </header>
+
+    <main class="stage">
+      <section id="screen-start" class="panel">
+        <p class="eyebrow">INSERT COIN</p>
+        <h1>NEON<br>TAC</h1>
+        <p class="tag">ARCADE EDITION</p>
+        <div class="marquee" aria-hidden="true">
+          <span>X</span><span>O</span><span>X</span>
+        </div>
+        <a id="start-link" class="start-link" href="#play">PRESS START</a>
+      </section>
+
+      <section id="screen-mode" class="panel" hidden>
+        <h2>SELECT</h2>
+        <div class="mode-list">
+          <button type="button" data-mode="easy">1P EASY</button>
+          <button type="button" data-mode="hard">1P HARD</button>
+          <button type="button" data-mode="pvp">2 PLAYERS</button>
+        </div>
+      </section>
+
+      <section id="screen-game" class="panel game-panel" hidden>
+        <p id="status" class="status" role="status" data-kind="turn">YOUR TURN</p>
+        <div class="board-slot">
+          <div class="board-frame">
+            <div id="board" class="board" role="group" aria-label="Tic tac toe board"></div>
+            <svg class="win-svg" viewBox="0 0 3 3" aria-hidden="true">
+              <line id="win-line" x1="0.5" y1="0.5" x2="2.5" y2="0.5"></line>
+            </svg>
+          </div>
+        </div>
+        <button type="button" id="restart">RESTART</button>
+      </section>
+    </main>
+  </div>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
