@@ -3,7 +3,9 @@ description: Start in poteto-mode and attach the Neon Tac verify report
 alwaysApply: true
 ---
 
-Every change in this repo starts in `/poteto-mode`.
+Every change in this repo starts by following `.cursor/skills/poteto-mode/SKILL.md`.
+
+The repo copies of architect, tdd, and blast-radius are `.cursor/skills/architect/SKILL.md`, `.cursor/skills/tdd/SKILL.md`, and `.cursor/skills/blast-radius/SKILL.md`. Follow those files. Read `.cursor/skills/PSTACK_VENDORED.md` before you replace them.
 
 Run `.cursor/skills/verify-tic-tac-toe/SKILL.md` before you finish a change. The command is `npm run verify`.
 
