@@ -26,10 +26,18 @@ jobs:
         uses: actions/checkout@v7
       - name: Setup Pages
         uses: actions/configure-pages@v6
+      - name: Collect runtime files
+        run: |
+          mkdir -p _site/css _site/js _site/fonts _site/icons
+          cp index.html manifest.webmanifest _site/
+          cp css/style.css _site/css/
+          cp js/game.js js/audio.js js/main.js _site/js/
+          cp fonts/press-start-2p-latin.woff2 fonts/OFL.txt _site/fonts/
+          cp icons/icon-192.png icons/icon-512.png icons/apple-touch-icon.png _site/icons/
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: .
+          path: _site
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5

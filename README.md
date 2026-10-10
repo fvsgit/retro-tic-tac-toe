@@ -40,6 +40,6 @@ Pages deploys with GitHub Actions. The workflow is `.github/workflows/pages.yml`
 1. Open **Settings → Pages**.
 2. Under **Build and deployment**, set **Source** to **GitHub Actions**.
 
-No build command. The site is served under `/retro-tic-tac-toe/`. Styles, scripts, the font, and icons use relative paths, and the web app manifest sets `start_url` and `scope` to `./`, so they resolve on that path.
+No build command. The workflow copies the files the game loads into `_site/` and uploads that directory, so tests and other repo files are not published. The site is served under `/retro-tic-tac-toe/`. Styles, scripts, the font, and icons use relative paths, and the web app manifest sets `start_url` and `scope` to `./`, so they resolve on that path.
 
 The pixel font is [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P), licensed under the SIL Open Font License (see `fonts/OFL.txt`), with Courier New as a fallback.
