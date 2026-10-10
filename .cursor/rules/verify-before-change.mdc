@@ -3,10 +3,14 @@ description: Start in poteto-mode and attach the Neon Tac verify report
 alwaysApply: true
 ---
 
-Every change in this repo starts in `/poteto-mode`.
+Every change in this repo starts by following `.cursor/skills/poteto-mode/SKILL.md`.
+
+The repo copies of architect, tdd, and blast-radius are `.cursor/skills/architect/SKILL.md`, `.cursor/skills/tdd/SKILL.md`, and `.cursor/skills/blast-radius/SKILL.md`. Follow those files. Read `.cursor/skills/PSTACK_VENDORED.md` before you replace them.
 
 Run `.cursor/skills/verify-tic-tac-toe/SKILL.md` before you finish a change. The command is `npm run verify`.
 
 Attach that command's per-criterion report to the pull request description.
 
 Do not edit `index.html`, `css/`, `js/`, `fonts/`, `icons/`, `manifest.webmanifest`, or the existing files in `test/` to make a seed or a test hook. Stub `Math.random` from the test.
+
+Never merge, enable auto-merge, or close a PR. Francois approves every merge.

@@ -55,7 +55,7 @@ Easy mode reads `Math.random`. Install the seed with `context.addInitScript(rngI
 
 The report is printed and saved at `tests/e2e/artifacts/report.txt`. Screenshots and pixel diffs, when a diff is not zero, are under `tests/e2e/artifacts/retro/`.
 
-A criterion is PASS only when every recorded check for it passed. A failed check is FAIL. Criteria 6 and 15 stay HUMAN when their automated checks passed, because a person still has to press Esc, install to an iPhone home screen, and hear the two themes.
+A criterion is PASS only when every recorded check for it passed. A failed check is FAIL. A thrown check is FAIL for that criterion. The report includes the error message. The run continues through the remaining criteria. The process exits non-zero when any criterion is FAIL. Criteria 6 and 15 stay HUMAN when their automated checks passed, because a person still has to press Esc, install to an iPhone home screen, and hear the two themes.
 
 Drive the page. Do not set the board by writing `js/game.js` state. Assert the status text, cell text, and computed style the player can observe.
 
