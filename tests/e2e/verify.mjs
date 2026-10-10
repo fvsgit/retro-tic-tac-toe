@@ -7,7 +7,7 @@ import pixelmatch from 'pixelmatch';
 import { chromium, devices, firefox, webkit } from 'playwright';
 import { PNG } from 'pngjs';
 import { hardMove } from '../../js/game.js';
-import { CRITERIA, formatReport } from './criteria.mjs';
+import { CRITERIA, createIsolatedRun, failureMessage, formatReport } from './criteria.mjs';
 import { EASY_BOARD, EASY_SEED, HARD_GAMES, POLICIES, checkFixtures } from './sim.mjs';
 import { rngInitSource } from './rng.mjs';
 import {
@@ -85,14 +85,8 @@ function record(id, ok, evidence) {
   checks.set(id, list);
 }
 
-async function step(id, evidence, run) {
-  try {
-    const extra = await run();
-    record(id, true, extra ? `${evidence} ${extra}` : evidence);
-  } catch (error) {
-    record(id, false, `${evidence} ${error.message}`);
-  }
-}
+const session = createIsolatedRun(record);
+const { step, visit } = session;
 
 function watch(page) {
   const bag = { errors: [], missing: [] };
@@ -944,54 +938,54 @@ async function main() {
 
     for (const theme of ['retro', 'sci-fi']) {
       const label = `chromium ${theme}`;
-      await withPage(chrome, { viewport: { width: 1280, height: 800 }, theme: theme === 'sci-fi' ? 'sci-fi' : undefined }, async (page) => {
+      await visit(1, () => withPage(chrome, { viewport: { width: 1280, height: 800 }, theme: theme === 'sci-fi' ? 'sci-fi' : undefined }, async (page) => {
         await gotoApp(page, url);
         await checkStart(page, theme, label);
         await checkModes(page, label, 'click');
         await checkRules(page, theme, label, 'click');
-      });
-      await withPage(chrome, { viewport: { width: 1280, height: 800 }, theme: theme === 'sci-fi' ? 'sci-fi' : undefined }, async (page) => {
+      }));
+      await visit(8, () => withPage(chrome, { viewport: { width: 1280, height: 800 }, theme: theme === 'sci-fi' ? 'sci-fi' : undefined }, async (page) => {
         await gotoApp(page, url);
         await checkKeyboard(page, label);
-      });
-      await withPage(chrome, { viewport: { width: 1280, height: 800 }, theme: theme === 'sci-fi' ? 'sci-fi' : undefined }, async (page) => {
+      }));
+      await visit(3, () => withPage(chrome, { viewport: { width: 1280, height: 800 }, theme: theme === 'sci-fi' ? 'sci-fi' : undefined }, async (page) => {
         await gotoApp(page, url);
         await checkCpu(page, theme, label);
-      });
-      await withPage(chrome, {
+      }));
+      await visit(3, () => withPage(chrome, {
         viewport: { width: 1280, height: 800 },
         theme: theme === 'sci-fi' ? 'sci-fi' : undefined,
         seed: EASY_SEED,
       }, async (page) => {
         await gotoApp(page, url);
         await checkEasy(page, label);
-      });
-      await withPage(chrome, {
+      }));
+      await visit(7, () => withPage(chrome, {
         viewport: { width: 1280, height: 800 },
         theme: theme === 'sci-fi' ? 'sci-fi' : undefined,
         spy: true,
       }, async (page) => {
         await gotoApp(page, url);
         await checkAudio(page, theme, label);
-      });
-      await withPage(chrome, { viewport: { width: 1280, height: 800 }, theme: theme === 'sci-fi' ? 'sci-fi' : undefined }, async (page) => {
+      }));
+      await visit(6, () => withPage(chrome, { viewport: { width: 1280, height: 800 }, theme: theme === 'sci-fi' ? 'sci-fi' : undefined }, async (page) => {
         await gotoApp(page, url);
         await checkFullscreen(page, label);
-      });
-      await withPage(fox, { viewport: { width: 1280, height: 800 }, theme: theme === 'sci-fi' ? 'sci-fi' : undefined }, async (page) => {
+      }));
+      await visit(1, () => withPage(fox, { viewport: { width: 1280, height: 800 }, theme: theme === 'sci-fi' ? 'sci-fi' : undefined }, async (page) => {
         await gotoApp(page, url);
         await checkSmoke(page, theme, `firefox ${theme}`, 'click');
-      });
-      await withPage(kit, { device: 'iPhone 13', theme: theme === 'sci-fi' ? 'sci-fi' : undefined }, async (page) => {
+      }));
+      await visit(1, () => withPage(kit, { device: 'iPhone 13', theme: theme === 'sci-fi' ? 'sci-fi' : undefined }, async (page) => {
         await gotoApp(page, url);
         await checkStart(page, theme, `webkit iphone ${theme}`);
         await checkIphoneFullscreen(page, `webkit iphone ${theme}`);
         await checkTouchMark(page, `webkit iphone ${theme}`, 'tap');
         await checkTheme(page, `webkit iphone ${theme}`, 'tap');
-      });
+      }));
     }
 
-    await withPage(chrome, { device: 'Pixel 7' }, async (page) => {
+    await visit(6, () => withPage(chrome, { device: 'Pixel 7' }, async (page) => {
       await gotoApp(page, url);
       await checkFullscreen(page, 'pixel');
       await checkTouchMark(page, 'pixel', 'tap');
@@ -1003,13 +997,13 @@ async function main() {
       await step(11, 'pixel corner', async () => {
         assert.equal((await boardBox(page)).overlap, false);
       });
-    });
+    }));
 
     for (const viewport of [
       { name: 'landscape', viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true },
       { name: 'narrow', viewport: { width: 320, height: 640 } },
     ]) {
-      await withPage(chrome, viewport, async (page) => {
+      await visit(6, () => withPage(chrome, viewport, async (page) => {
         await gotoApp(page, url);
         await startMode(page, 'pvp', 'click');
         await step(6, `${viewport.name} board`, async () => {
@@ -1020,65 +1014,67 @@ async function main() {
         await step(11, `${viewport.name} corner`, async () => {
           assert.equal((await boardBox(page)).overlap, false);
         });
-      });
+      }));
     }
 
-    await withPage(kit, { device: 'iPhone 13', stripFullscreen: true }, async (page) => {
+    await visit(6, () => withPage(kit, { device: 'iPhone 13', stripFullscreen: true }, async (page) => {
       await gotoApp(page, url);
       await checkStrippedIphone(page, 'webkit iphone');
-    });
+    }));
 
-    await withPage(chrome, { viewport: { width: 1280, height: 800 } }, async (page) => {
+    await visit(6, () => withPage(chrome, { viewport: { width: 1280, height: 800 } }, async (page) => {
       await gotoApp(page, url);
       await checkManifest(page, 'chromium');
       await checkTheme(page, 'chromium', 'click');
       await checkTheme(page, 'chromium keyboard', 'keyboard');
-    });
+    }));
 
-    await withPage(chrome, { viewport: { width: 1280, height: 800 } }, async (page) => {
+    await visit(12, () => withPage(chrome, { viewport: { width: 1280, height: 800 } }, async (page) => {
       await gotoApp(page, url);
       await checkKeepMatch(page, 'chromium');
       await checkInstant(page, 'chromium');
-    });
+    }));
 
-    await withPage(chrome, { viewport: { width: 1280, height: 800 }, reducedMotion: 'no-preference' }, async (page) => {
+    await visit(1, () => withPage(chrome, { viewport: { width: 1280, height: 800 }, reducedMotion: 'no-preference' }, async (page) => {
       await gotoApp(page, url);
       await checkMotion(page, 'chromium motion');
-    });
+    }));
 
-    try {
-      baseSha = resolveSha(repoRoot, resolveBaseRef());
-      assertDistinctCommits(headSha, baseSha);
-      meta.base = baseSha;
-      worktree = addWorktree(repoRoot, baseSha);
-      const baseParent = path.join(artifactDir, 'www-base');
-      const baseSite = path.join(baseParent, 'retro-tic-tac-toe');
-      buildSite(worktree, baseSite);
-      if (path.resolve(baseSite) === path.resolve(headSite)) {
-        throw new Error('base and head sites are the same directory');
+    await visit(10, async () => {
+      try {
+        baseSha = resolveSha(repoRoot, resolveBaseRef());
+        assertDistinctCommits(headSha, baseSha);
+        meta.base = baseSha;
+        worktree = addWorktree(repoRoot, baseSha);
+        const baseParent = path.join(artifactDir, 'www-base');
+        const baseSite = path.join(baseParent, 'retro-tic-tac-toe');
+        buildSite(worktree, baseSite);
+        if (path.resolve(baseSite) === path.resolve(headSite)) {
+          throw new Error('base and head sites are the same directory');
+        }
+        const baseServer = await listen(baseParent);
+        closers.push(baseServer.close);
+        const baseUrl = `${baseServer.origin}/retro-tic-tac-toe/`;
+        const baseDir = path.join(artifactDir, 'retro', 'base');
+        const headDir = path.join(artifactDir, 'retro', 'head');
+        process.stderr.write(`RETRO base ${baseSha} ${baseUrl}\n`);
+        await captureRetro(chromium, baseUrl, baseDir, 'desk');
+        await captureRetro(webkit, baseUrl, baseDir, 'iphone');
+        await captureRetro(chromium, url, headDir, 'desk');
+        await captureRetro(webkit, url, headDir, 'iphone');
+        const headHash = fileHash(path.join(headSite, 'index.html'));
+        const baseHash = fileHash(path.join(baseSite, 'index.html'));
+        for (const name of SHOTS) {
+          const result = compareShot(baseDir, headDir, name);
+          record(10, result.ok, `base ${baseSha.slice(0, 12)} head ${headSha.slice(0, 12)} index ${baseHash} vs ${headHash} ${result.detail}`);
+        }
+      } catch (error) {
+        meta.base = baseSha;
+        record(10, false, failureMessage(error));
       }
-      const baseServer = await listen(baseParent);
-      closers.push(baseServer.close);
-      const baseUrl = `${baseServer.origin}/retro-tic-tac-toe/`;
-      const baseDir = path.join(artifactDir, 'retro', 'base');
-      const headDir = path.join(artifactDir, 'retro', 'head');
-      process.stderr.write(`RETRO base ${baseSha} ${baseUrl}\n`);
-      await captureRetro(chromium, baseUrl, baseDir, 'desk');
-      await captureRetro(webkit, baseUrl, baseDir, 'iphone');
-      await captureRetro(chromium, url, headDir, 'desk');
-      await captureRetro(webkit, url, headDir, 'iphone');
-      const headHash = fileHash(path.join(headSite, 'index.html'));
-      const baseHash = fileHash(path.join(baseSite, 'index.html'));
-      for (const name of SHOTS) {
-        const result = compareShot(baseDir, headDir, name);
-        record(10, result.ok, `base ${baseSha.slice(0, 12)} head ${headSha.slice(0, 12)} index ${baseHash} vs ${headHash} ${result.detail}`);
-      }
-    } catch (error) {
-      meta.base = baseSha;
-      record(10, false, error.message);
-    }
+    });
   } catch (error) {
-    record(1, false, error.stack || error.message);
+    record(session.active, false, failureMessage(error));
   } finally {
     for (const close of closers.reverse()) {
       try {

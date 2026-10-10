@@ -23,6 +23,43 @@ export function verdict(criterion, checks) {
   return 'PASS';
 }
 
+export function failureMessage(error) {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
+
+export async function guardCall(run) {
+  try {
+    const extra = await run();
+    return { ok: true, extra };
+  } catch (error) {
+    return { ok: false, message: failureMessage(error) };
+  }
+}
+
+export function createIsolatedRun(record) {
+  let active = 1;
+  return {
+    get active() {
+      return active;
+    },
+    async step(id, evidence, run) {
+      active = id;
+      const outcome = await guardCall(run);
+      if (outcome.ok) {
+        record(id, true, outcome.extra ? `${evidence} ${outcome.extra}` : evidence);
+        return;
+      }
+      record(id, false, `${evidence} ${outcome.message}`);
+    },
+    async visit(id, run) {
+      active = id;
+      const outcome = await guardCall(run);
+      if (!outcome.ok) record(active, false, outcome.message);
+    },
+  };
+}
+
 export function formatReport(checksById, meta) {
   const lines = [
     'Neon Tac verification',
