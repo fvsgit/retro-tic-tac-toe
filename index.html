@@ -1,8 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="retro">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <script>
+    (function () {
+      var theme = "retro";
+      try {
+        if (localStorage.getItem("neon-tac-theme") === "sci-fi") theme = "sci-fi";
+      } catch (e) {}
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
   <title>Neon Tac</title>
   <meta name="description" content="Retro arcade tic-tac-toe for one or two players.">
   <meta name="theme-color" content="#05010a">
