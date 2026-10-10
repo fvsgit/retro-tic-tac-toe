@@ -910,10 +910,6 @@ async function main() {
     return;
   }
 
-  assertPagesMatch(fs.readFileSync(path.join(repoRoot, '.github/workflows/pages.yml'), 'utf8'));
-  assertBrowsersInstalled();
-  checkFixtures();
-
   const headSha = git(repoRoot, ['rev-parse', 'HEAD']);
   let baseSha = 'unresolved';
   const meta = { head: headSha, base: baseSha };
@@ -921,6 +917,10 @@ async function main() {
   let worktree = null;
 
   try {
+    assertPagesMatch(fs.readFileSync(path.join(repoRoot, '.github/workflows/pages.yml'), 'utf8'));
+    assertBrowsersInstalled();
+    await visit(3, () => checkFixtures());
+
     fs.rmSync(artifactDir, { recursive: true, force: true });
     fs.mkdirSync(artifactDir, { recursive: true });
     const headParent = path.join(artifactDir, 'www-head');
