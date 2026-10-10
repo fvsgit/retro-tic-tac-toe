@@ -1,10 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="retro">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <script>
+    (function () {
+      var theme = "retro";
+      try {
+        if (localStorage.getItem("neon-tac-theme") === "sci-fi") theme = "sci-fi";
+      } catch (e) {}
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
   <title>Neon Tac</title>
-  <meta name="description" content="Retro arcade tic-tac-toe for one or two players.">
+  <meta name="description" content="Arcade and sci-fi tic-tac-toe for one or two players.">
   <meta name="theme-color" content="#05010a">
   <meta name="color-scheme" content="dark">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,6 +24,7 @@
   <link rel="icon" href="icons/icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="preload" href="fonts/press-start-2p-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/orbitron-wght.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -25,18 +35,22 @@
       <div class="top-actions">
         <button type="button" id="mute" aria-pressed="false">SND</button>
         <button type="button" id="fullscreen" hidden aria-pressed="false">FULL</button>
+        <button type="button" id="theme-corner" aria-pressed="false">RETRO</button>
       </div>
     </header>
 
     <main class="stage">
       <section id="screen-start" class="panel">
-        <p class="eyebrow">INSERT COIN</p>
+        <p class="eyebrow"><span class="for-retro">INSERT COIN</span><span class="for-sci-fi">SYSTEM ONLINE</span></p>
         <h1>NEON<br>TAC</h1>
-        <p class="tag">ARCADE EDITION</p>
+        <p class="tag"><span class="for-retro">ARCADE EDITION</span><span class="for-sci-fi">ORBITAL EDITION</span></p>
         <div class="marquee" aria-hidden="true">
           <span>X</span><span>O</span><span>X</span>
         </div>
-        <a id="start-link" class="start-link" href="#play">PRESS START</a>
+        <div class="start-row">
+          <button type="button" id="theme-start" aria-pressed="false">RETRO</button>
+          <a id="start-link" class="start-link" href="#play">PRESS START</a>
+        </div>
       </section>
 
       <section id="screen-mode" class="panel" hidden>

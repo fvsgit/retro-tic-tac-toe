@@ -1,7 +1,7 @@
 {
   "name": "Neon Tac",
   "short_name": "Neon Tac",
-  "description": "Retro arcade tic-tac-toe for one or two players.",
+  "description": "Arcade and sci-fi tic-tac-toe for one or two players.",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",
