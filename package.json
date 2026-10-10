@@ -3,6 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "verify": "node tests/e2e/verify.mjs"
+  },
+  "devDependencies": {
+    "pixelmatch": "^8.0.0",
+    "playwright": "^1.64.0",
+    "pngjs": "^7.0.0"
   }
 }
