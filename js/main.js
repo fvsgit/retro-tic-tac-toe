@@ -7,9 +7,17 @@ import {
   playMove,
   playUi,
   playWin,
+  setSoundTheme,
   toggleMuted,
   unlockAudio,
 } from './audio.js';
+import {
+  applyTheme,
+  difficultyOf,
+  readTheme,
+  toggleThemeName,
+  writeTheme,
+} from './theme.js';
 
 const HUMAN = 'X';
 const CPU = 'O';
@@ -28,6 +36,9 @@ const restartBtn = document.querySelector('#restart');
 const muteBtn = document.querySelector('#mute');
 const fullscreenBtn = document.querySelector('#fullscreen');
 const homeBtn = document.querySelector('#home');
+const themeCornerBtn = document.querySelector('#theme-corner');
+const themeStartBtn = document.querySelector('#theme-start');
+const themeMeta = document.querySelector('meta[name="theme-color"]');
 
 const cells = Array.from({ length: 9 }, (_, index) => {
   const button = document.createElement('button');
@@ -41,6 +52,8 @@ const cells = Array.from({ length: 9 }, (_, index) => {
 let screen = 'start';
 let mode = 'pvp';
 let game = createGame();
+let score = null;
+let theme = readTheme(localStorage);
 let cursor = 0;
 let aiTimer = 0;
 
@@ -128,7 +141,9 @@ function render() {
     winLine.setAttribute('x2', String((end % 3) + 0.5));
     winLine.setAttribute('y2', String(Math.floor(end / 3) + 0.5));
     winLine.style.display = '';
+    winLine.classList.add('is-drawn');
   } else {
+    winLine.classList.remove('is-drawn');
     winLine.style.display = 'none';
   }
 }
@@ -250,6 +265,55 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
+function playSnapshot() {
+  return {
+    theme,
+    board: game.board,
+    turn: game.turn,
+    mode,
+    difficulty: difficultyOf(mode),
+    muted: isMuted(),
+    score,
+    winner: game.winner,
+    line: game.line,
+    draw: game.draw,
+    game,
+  };
+}
+
+function paintTheme(nextTheme) {
+  document.documentElement.dataset.theme = nextTheme;
+  setSoundTheme(nextTheme);
+  if (themeMeta) themeMeta.content = nextTheme === 'sci-fi' ? '#050814' : '#05010a';
+}
+
+function syncTheme() {
+  const sciFi = theme === 'sci-fi';
+  const label = sciFi ? 'SCI-FI' : 'RETRO';
+  const help = sciFi ? 'Sci-fi theme on. Switch to retro' : 'Retro theme on. Switch to sci-fi';
+  for (const button of [themeCornerBtn, themeStartBtn]) {
+    button.textContent = label;
+    button.setAttribute('aria-pressed', sciFi ? 'true' : 'false');
+    button.setAttribute('aria-label', help);
+  }
+}
+
+function chooseTheme(nextTheme) {
+  const next = applyTheme(playSnapshot(), nextTheme);
+  theme = next.theme;
+  mode = next.mode;
+  game = next.game;
+  score = next.score;
+  writeTheme(localStorage, theme);
+  paintTheme(theme);
+  syncTheme();
+  if (winLine.classList.contains('is-drawn')) {
+    winLine.classList.remove('is-drawn');
+    void winLine.getBoundingClientRect();
+    winLine.classList.add('is-drawn');
+  }
+}
+
 function syncMute() {
   const muted = isMuted();
   muteBtn.setAttribute('aria-pressed', muted ? 'true' : 'false');
@@ -264,6 +328,15 @@ muteBtn.addEventListener('click', () => {
   syncMute();
   if (!isMuted()) playUi();
 });
+
+function onThemeClick() {
+  unlockAudio();
+  chooseTheme(toggleThemeName(theme));
+  playUi();
+}
+
+themeCornerBtn.addEventListener('click', onThemeClick);
+themeStartBtn.addEventListener('click', onThemeClick);
 
 function fullscreenApi() {
   const root = document.documentElement;
@@ -313,6 +386,8 @@ fullscreenBtn.addEventListener('click', async () => {
 document.addEventListener('fullscreenchange', syncFullscreen);
 document.addEventListener('webkitfullscreenchange', syncFullscreen);
 
+paintTheme(theme);
+syncTheme();
 syncMute();
 syncFullscreen();
 show('start');

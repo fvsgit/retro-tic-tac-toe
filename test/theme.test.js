@@ -167,3 +167,26 @@ test('the boot script reads the saved theme before the stylesheet', () => {
   assert.match(head, /documentElement\.setAttribute\("data-theme", theme\)/);
   assert.match(html, /<html lang="en" data-theme="retro">/);
 });
+
+test('theme controls sit in the top bar and on the start screen', () => {
+  const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const top = html.slice(html.indexOf('class="top-actions"'), html.indexOf('</header>'));
+  assert.match(top, /id="theme-corner"/);
+  const start = html.slice(html.indexOf('id="screen-start"'), html.indexOf('id="screen-mode"'));
+  assert.match(start, /id="theme-start"/);
+  const css = fs.readFileSync(new URL('../css/style.css', import.meta.url), 'utf8');
+  assert.doesNotMatch(css, /#theme-corner\s*\{[^}]*position:\s*(?:fixed|absolute)/);
+  assert.match(css, /backdrop-filter:\s*var\(--panel-blur\)/);
+  assert.match(css, /-webkit-backdrop-filter:\s*var\(--panel-blur\)/);
+  assert.match(css, /\[data-theme="sci-fi"\] \.cell\.x::before/);
+  assert.match(css, /\[data-theme="sci-fi"\] \.cell\.o::before/);
+  assert.match(css, /@keyframes win-draw/);
+  const motion = css.slice(css.lastIndexOf('@media (prefers-reduced-motion: reduce)'));
+  assert.match(motion, /animation:\s*none/);
+  assert.match(motion, /#win-line/);
+  assert.match(motion, /stroke-dashoffset:\s*0/);
+  const workflow = fs.readFileSync(new URL('../.github/workflows/pages.yml', import.meta.url), 'utf8');
+  assert.match(workflow, /js\/theme\.js/);
+  assert.match(workflow, /orbitron-wght\.ttf/);
+  assert.match(workflow, /OFL-Orbitron\.txt/);
+});

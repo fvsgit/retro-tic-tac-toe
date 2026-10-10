@@ -7,11 +7,12 @@ Retro arcade tic-tac-toe. Static HTML, CSS, and JavaScript: open the site from `
 1. Follow the single **PRESS START** link.
 2. Choose a mode on the next screen: **1P EASY**, **1P HARD**, or **2P**.
 3. You play X and go first against the computer. In 2P, X and O share the same board.
-4. Place a mark with the mouse, a tap, or the keyboard. Arrow keys move the amber cursor. Enter places a mark.
+4. Place a mark with the mouse, a tap, or the keyboard. Arrow keys move the cursor. Enter places a mark.
 5. Three in a row lights that line and names the winner. A full board with no winner shows **DRAW**.
 6. The board locks when the game ends. **RESTART** clears it in one click or tap and keeps the same mode.
 7. **FULL** toggles fullscreen. Esc leaves fullscreen and the button updates with it. The control is hidden where the Fullscreen API is missing, including iPhone Safari. Install the page to an iPhone home screen (Share, then Add to Home Screen) and it opens fullscreen.
-8. **SND** / **OFF** mutes the 8-bit sounds. The choice is stored in this browser. Audio starts only after the first click, tap, or key press.
+8. **SND** / **OFF** mutes the sounds. Retro keeps the 8-bit square waves. Sci-fi uses soft sine tones. The choice is stored in this browser. Audio starts only after the first click, tap, or key press.
+9. **RETRO** / **SCI-FI** changes only the look. One control is on the start screen and a small one sits in the top corner during play, in the header so it never covers the board. Board, turn, mode, difficulty, and mute stay as they are, including mid-game and after a win. The choice is stored in this browser.
 
 Hard mode plays perfect minimax and does not lose. Easy mode picks a random legal move about half the time, so it can be beaten.
 
@@ -40,6 +41,6 @@ Pages deploys with GitHub Actions. The workflow is `.github/workflows/pages.yml`
 1. Open **Settings → Pages**.
 2. Under **Build and deployment**, set **Source** to **GitHub Actions**.
 
-No build command. The workflow copies the files the game loads into `_site/` and uploads that directory, so tests and other repo files are not published. The site is served under `/retro-tic-tac-toe/`. Styles, scripts, the font, and icons use relative paths, and the web app manifest sets `start_url` and `scope` to `./`, so they resolve on that path.
+No build command. The workflow copies the files the game loads into `_site/` and uploads that directory, so tests and other repo files are not published. The site is served under `/retro-tic-tac-toe/`. Styles, scripts, the fonts, and icons use relative paths, and the web app manifest sets `start_url` and `scope` to `./`, so they resolve on that path.
 
-The pixel font is [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P), licensed under the SIL Open Font License (see `fonts/OFL.txt`), with Courier New as a fallback.
+Retro uses [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P), licensed under the SIL Open Font License (see `fonts/OFL.txt`), with Courier New as a fallback. Sci-fi uses [Orbitron](https://fonts.google.com/specimen/Orbitron), also under the SIL Open Font License (see `fonts/OFL-Orbitron.txt`), with a system sans-serif as a fallback.
