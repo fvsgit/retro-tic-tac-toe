@@ -35,11 +35,11 @@ node --test
 
 ## GitHub Pages
 
-1. Push the repository to GitHub.
-2. Open **Settings → Pages**.
-3. Under **Build and deployment**, choose **Deploy from a branch**.
-4. Select the `main` branch and the `/ (root)` folder, then save.
+Pages deploys with GitHub Actions. The workflow is `.github/workflows/pages.yml`: it runs on every push to `main` and from the Actions tab (**Run workflow**).
 
-The site is served from the repository root. No build command is required.
+1. Open **Settings → Pages**.
+2. Under **Build and deployment**, set **Source** to **GitHub Actions**.
+
+No build command. The site is served under `/retro-tic-tac-toe/`. Styles, scripts, the font, and icons use relative paths, and the web app manifest sets `start_url` and `scope` to `./`, so they resolve on that path.
 
 The pixel font is [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P), licensed under the SIL Open Font License (see `fonts/OFL.txt`), with Courier New as a fallback.
