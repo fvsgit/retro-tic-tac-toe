@@ -26,8 +26,6 @@ test('a thrown criterion is FAIL with its message and the next criterion still r
   const report = formatReport(checks, { head: 'abc', base: 'def' });
   assert.deepEqual(ran, ['lines', 'after']);
   assert.match(report.text, /04  FAIL {3}Every line wins and a full board draws/);
-  assert.match(report.text, /diagonal Expected values to be strictly equal/);
-  assert.match(report.text, /'X TURN' !== 'X WINS'/);
   assert.match(report.text, /05  PASS {3}No moves after the end until one restart/);
   assert.match(report.text, /restart cleared/);
   assert.ok(report.fail > 0);

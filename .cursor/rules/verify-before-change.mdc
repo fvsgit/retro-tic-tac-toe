@@ -12,3 +12,5 @@ Run `.cursor/skills/verify-tic-tac-toe/SKILL.md` before you finish a change. The
 Attach that command's per-criterion report to the pull request description.
 
 Do not edit `index.html`, `css/`, `js/`, `fonts/`, `icons/`, `manifest.webmanifest`, or the existing files in `test/` to make a seed or a test hook. Stub `Math.random` from the test.
+
+Never merge, enable auto-merge, or close a PR. Francois approves every merge.

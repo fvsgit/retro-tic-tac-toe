@@ -25,17 +25,21 @@ Replace these copies only in a change that means to update them.
 
 ## Deliberately omitted
 
-Searched every vendored `SKILL.md`, playbook, and reference for `poteto-mode/scripts/` and for `bootstrap.ts`, `check-plan.mjs`, `worktree-audit.sh`, `orch`, and `watch-pr`.
+Playbooks removed from this copy. They tell an agent to merge, enable auto-merge, or close a PR. Francois approves every merge.
 
-References found:
+- `poteto-mode/playbooks/shipping.md`
+- `poteto-mode/playbooks/autopilot-full.md`
+- `poteto-mode/playbooks/autopilot-stack.md`
+- `poteto-mode/playbooks/multi-phase-plan.md`
+- `poteto-mode/playbooks/orchestrate.md`
 
-- `poteto-mode/playbooks/shipping.md` runs `scripts/watch-pr/watch-pr`. Shipping is one of the playbooks this repo follows, so the watcher stays.
-- `poteto-mode/playbooks/babysit.md` runs the same `scripts/watch-pr/watch-pr`. It stays with the shipping watcher.
-- `scripts/watch-pr/watch-pr` imports `bootstrap.ts`. `bootstrap.ts` reads `package.json` and `bun.lock` and installs `commander`. Those files stay.
-- `poteto-mode/playbooks/multi-phase-plan.md` runs `node pstack/skills/poteto-mode/scripts/check-plan.mjs`. Removed. This repo does not follow that playbook for day-to-day changes.
-- `poteto-mode/playbooks/orchestrate.md` runs `scripts/orch/orch.ts` and the `orch` commands. Removed for the same reason.
-- `poteto-mode/playbooks/worktree-cleanup.md` runs `scripts/worktree-audit.sh`. Removed for the same reason.
-- `feature`, `bug-fix`, `opening-a-pr`, `tdd`, `architect`, and `blast-radius` do not call these scripts.
+`poteto-mode/SKILL.md` no longer routes to those files. A land, ship, merge, auto-merge, or close request stops. A standing program stays with figure-it-out. Babysit stops at merge-ready.
+
+`multi-phase-plan.md` was the only caller of `scripts/check-plan.mjs`. `orchestrate.md` was the only caller of `scripts/orch/`. Both scripts stay deleted.
+
+`babysit.md` still runs `scripts/watch-pr/watch-pr` for GitHub status. That is why the watcher stays. `scripts/watch-pr/watch-pr` imports `bootstrap.ts`. `bootstrap.ts` reads `package.json` and `bun.lock` and installs `commander`. Those files stay.
+
+`worktree-cleanup.md` used to run `scripts/worktree-audit.sh`. The script stays deleted. The playbook now classifies worktrees from `git worktree list`.
 
 Removed from `.cursor/skills/poteto-mode/scripts/`:
 
@@ -45,9 +49,22 @@ Removed from `.cursor/skills/poteto-mode/scripts/`:
 - `watch-pr` tests and typecheck-only files (`cli.test.ts`, `github.test.ts`, `policy.test.ts`, `fakes.test-helper.ts`, `types.compile.ts`, `tsconfig.json`)
 - the `package.json` `test` and `typecheck` scripts, which pointed at `orch` and that tsconfig
 
-Kept so `scripts/watch-pr/watch-pr` can still run:
+Kept so `scripts/watch-pr/watch-pr` can still run for `babysit.md`:
 
 - `bootstrap.ts`
 - `package.json`
 - `bun.lock`
 - `watch-pr/watch-pr`, `cli.ts`, `github.ts`, `policy.ts`, `render.ts`, `types.ts`
+
+## Local modifications
+
+These files differ from the vendored source so this copy does not merge, enable auto-merge, or close a PR.
+
+- `poteto-mode/SKILL.md`. The land or ship trigger stops. Francois approves every merge. The Orchestrate route now stays with figure-it-out. Removed the Shipping, Orchestrate, Autopilot-full, Autopilot-stack, and Multi-phase bullets. The Babysit bullet stops at merge-ready.
+- `poteto-mode/playbooks/babysit.md`. A request to merge, land, ship, or close stops for Francois. Removed the route to `shipping.md`, the "unless the user explicitly asked to merge" exception, and the Autopilot-full and Autopilot-stack owner exceptions. Step 6 still runs `scripts/watch-pr/watch-pr`. It does not run `origin pr merge`, `gh pr merge`, or a close command, and it does not arm merge-when-ready.
+- `poteto-mode/playbooks/opening-a-pr.md`. Forge operations are create, edit, view, and watch. Do not merge, enable auto-merge, or close a PR. Removed the Autopilot-full and Autopilot-stack owner exception. A subagent that opens a PR does not merge, enable auto-merge, or close it.
+- `poteto-mode/playbooks/autonomous-run.md`. The exit examples no longer include "all N PRs merged". A predicate that requires a merge or a closed PR is not one the agent can meet.
+- `poteto-mode/playbooks/worktree-cleanup.md`. Step 1 no longer runs `scripts/worktree-audit.sh`.
+- `blast-radius/SKILL.md`. The handback heading "Before you merge" is now "Before a merge." Francois approves every merge.
+
+Other remaining playbooks were read. They do not tell the agent to merge, enable auto-merge, or close a PR. "Before shipping" in `SKILL.md` and `feature.md` means finish the product check. It is not a route to `shipping.md`.
