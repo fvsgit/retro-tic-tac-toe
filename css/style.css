@@ -102,13 +102,16 @@ a {
 .stage {
   flex: 1 1 auto;
   min-height: 0;
-  display: flex;
+  min-width: 0;
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   align-items: center;
-  justify-content: center;
+  justify-items: center;
 }
 
 .panel {
   width: min(100%, 640px);
+  max-height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -235,10 +238,14 @@ h2,
   text-shadow: 0 0 8px var(--magenta);
 }
 
-.game-panel {
+#screen-game.game-panel {
+  align-self: stretch;
+  justify-self: center;
+  width: min(100%, 960px);
   height: 100%;
-  width: min(100%, 720px);
+  max-height: 100%;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr) auto;
   justify-items: stretch;
   align-items: stretch;

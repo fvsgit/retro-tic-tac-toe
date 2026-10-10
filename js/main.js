@@ -63,6 +63,10 @@ function cpuTurn() {
   return mode !== 'pvp' && game.turn === CPU && !isGameOver(game);
 }
 
+function focusCursor() {
+  cells[cursor]?.focus({ preventScroll: true });
+}
+
 function setCursor(index, announce) {
   if (index === cursor) {
     paintCursor();
@@ -171,6 +175,7 @@ function startMatch(nextMode) {
   cursor = 0;
   show('game');
   render();
+  focusCursor();
 }
 
 function moveCursor(key) {
@@ -237,8 +242,12 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && chromeControl(event.target)) return;
   event.preventDefault();
   unlockAudio();
-  if (arrows) moveCursor(event.key);
-  else place(cursor);
+  if (arrows) {
+    moveCursor(event.key);
+    focusCursor();
+  } else {
+    place(cursor);
+  }
 });
 
 function syncMute() {
