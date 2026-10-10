@@ -480,19 +480,25 @@ async function checkRules(page, theme, label, input) {
 async function checkKeyboard(page, label) {
   await step(8, `${label} keyboard`, async () => {
     await startMode(page, 'pvp', 'click');
+    await page.mouse.move(0, 0);
     const cursor = () => page.$$eval('.cell', (cells) => cells.findIndex((cell) => cell.classList.contains('cursor')));
-    await page.keyboard.press('ArrowRight');
-    assert.equal(await cursor(), 1);
-    await page.keyboard.press('ArrowDown');
-    assert.equal(await cursor(), 4);
-    await page.keyboard.press('ArrowLeft');
-    assert.equal(await cursor(), 3);
-    await page.keyboard.press('ArrowUp');
-    assert.equal(await cursor(), 0);
-    await page.keyboard.press('ArrowRight');
+    let index = await cursor();
+    const stepTo = async (key, next) => {
+      await page.keyboard.press(key);
+      index = next(index);
+      assert.equal(await cursor(), index, key);
+    };
+    const right = (cell) => Math.floor(cell / 3) * 3 + ((cell % 3) + 1) % 3;
+    const left = (cell) => Math.floor(cell / 3) * 3 + ((cell % 3) + 2) % 3;
+    const down = (cell) => ((Math.floor(cell / 3) + 1) % 3) * 3 + (cell % 3);
+    const up = (cell) => ((Math.floor(cell / 3) + 2) % 3) * 3 + (cell % 3);
+    await stepTo('ArrowRight', right);
+    await stepTo('ArrowDown', down);
+    await stepTo('ArrowLeft', left);
+    await stepTo('ArrowUp', up);
     await page.keyboard.press('Enter');
-    assert.equal((await readBoard(page))[1], 'X');
-    return 'arrows then Enter wrote X on cell 1';
+    assert.equal((await readBoard(page))[index], 'X');
+    return `arrows returned to cell ${index} and Enter wrote X`;
   });
 }
 
@@ -539,7 +545,7 @@ async function checkAudio(page, theme, label) {
     if (theme === 'retro') {
       await clickControl(page, '#theme-corner', 'click');
       await moveCell(page, 1, 'click');
-      const afterSwitch = await page.evaluate(() => window.__waves.slice(beforeSwitch.length));
+      const afterSwitch = await page.evaluate((start) => window.__waves.slice(start), beforeSwitch.length);
       assert.ok(afterSwitch.length > 0, 'no sci-fi oscillators');
       assert.ok(afterSwitch.every((wave) => wave === 'sine'), afterSwitch.join(','));
     }
@@ -569,15 +575,16 @@ async function checkFullscreen(page, label) {
     const hidden = await page.$eval('#fullscreen', (el) => el.hidden);
     assert.equal(hidden, false);
     await page.click('#fullscreen');
-    await page.waitForFunction(() => document.fullscreenElement || document.webkitFullscreenElement);
-    assert.equal((await page.textContent('#fullscreen')).trim(), 'EXIT');
-    await page.evaluate(() => {
-      const exit = document.exitFullscreen || document.webkitExitFullscreen;
-      return exit.call(document);
+    await page.waitForFunction(() => {
+      const active = document.fullscreenElement || document.webkitFullscreenElement;
+      return active && document.querySelector('#fullscreen').textContent.trim() === 'EXIT';
     });
-    await page.waitForFunction(() => !(document.fullscreenElement || document.webkitFullscreenElement));
-    assert.equal((await page.textContent('#fullscreen')).trim(), 'FULL');
-    return 'FULL then EXIT then FULL';
+    await page.click('#fullscreen');
+    await page.waitForFunction(() => {
+      const active = document.fullscreenElement || document.webkitFullscreenElement;
+      return !active && document.querySelector('#fullscreen').textContent.trim() === 'FULL';
+    });
+    return 'button entered fullscreen as EXIT and left it as FULL';
   });
 }
 
@@ -585,14 +592,13 @@ async function checkIphoneFullscreen(page, label) {
   await step(6, `${label} iPhone button`, async () => {
     const facts = await page.evaluate(() => ({
       hidden: document.querySelector('#fullscreen').hidden,
-      enabled: document.fullscreenEnabled ?? document.webkitFullscreenEnabled,
+      enabled: document.fullscreenEnabled ?? null,
+      webkit: document.webkitFullscreenEnabled ?? null,
+      request: typeof document.documentElement.requestFullscreen,
+      webkitRequest: typeof document.documentElement.webkitRequestFullscreen,
     }));
-    if (facts.enabled === false) {
-      assert.equal(facts.hidden, true);
-      return 'Fullscreen API absent, button hidden';
-    }
-    assert.equal(facts.hidden, false);
-    return 'Playwright WebKit still exposes the Fullscreen API, so the button stays visible';
+    assert.equal(facts.hidden, true);
+    return `button hidden (${JSON.stringify(facts)})`;
   });
 }
 
@@ -626,15 +632,16 @@ async function checkManifest(page, label) {
 async function checkTheme(page, label, input) {
   await step(11, `${label} ${input} toggle`, async () => {
     await ensureStart(page, input === 'keyboard' ? 'click' : input);
-    const control = '#theme-start';
+    const before = await page.evaluate(() => document.documentElement.dataset.theme);
+    const opposite = before === 'sci-fi' ? 'retro' : 'sci-fi';
     if (input === 'keyboard') {
-      await page.focus(control);
+      await page.focus('#theme-start');
       await page.keyboard.press('Enter');
     } else {
-      await clickControl(page, control, input);
+      await clickControl(page, '#theme-start', input);
     }
     const theme = await page.evaluate(() => document.documentElement.dataset.theme);
-    assert.equal(theme, 'sci-fi');
+    assert.equal(theme, opposite);
     await startMode(page, 'pvp', input === 'keyboard' ? 'click' : input);
     if (input === 'keyboard') {
       await page.focus('#theme-corner');
@@ -643,7 +650,7 @@ async function checkTheme(page, label, input) {
       await clickControl(page, '#theme-corner', input);
     }
     const next = await page.evaluate(() => document.documentElement.dataset.theme);
-    assert.equal(next, 'retro');
+    assert.equal(next, before);
     assert.deepEqual(await readBoard(page), Array(9).fill(''));
     const box = await boardBox(page);
     assert.equal(box.overlap, false);
